@@ -3,4 +3,6 @@ project(parking_sensor)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(parking_sensor main.cpp)
+add_executable(parking_sensor src/main.cpp
+        src/Sensor.cpp
+        src/Sensor.h)
