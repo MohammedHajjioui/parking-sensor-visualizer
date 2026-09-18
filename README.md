@@ -58,7 +58,6 @@ distance: 12
 - C++20
 - CMake
 - CLion
-- Git and GitHub
 
 ## Roadmap
 
