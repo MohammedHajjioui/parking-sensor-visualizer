@@ -2,6 +2,10 @@
 #define PARKING_SENSOR_SENSOR_H
 
 #include <string>
+constexpr int SAFE_DISTANCE = 150;
+constexpr int OBSTACLE_DISTANCE = 81;
+constexpr int WARNING_DISTANCE = 41;
+constexpr int BRAKE_DISTANCE = 16;
 
 enum class AlertLevel {
     Safe,
@@ -18,9 +22,9 @@ class Sensor {
 
         bool setDistance(int distance);
 
-        const std::string& getName() const;
-        int getDistance() const;
-        AlertLevel getAlertLevel() const;
+        [[nodiscard]] const std::string& getName() const;
+        [[nodiscard]] int getDistance() const;
+        [[nodiscard]] AlertLevel getAlertLevel() const;
 
     private:
         std::string name_;
