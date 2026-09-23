@@ -5,4 +5,6 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_executable(parking_sensor src/main.cpp
         src/Sensor.cpp
-        src/Sensor.h)
+        src/Sensor.h
+        src/ConsoleInput.cpp
+        src/ConsoleInput.h)

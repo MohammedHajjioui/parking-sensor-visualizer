@@ -2,23 +2,11 @@
 #define PARKING_SENSOR_SENSOR_H
 
 #include <string>
-constexpr int SAFE_DISTANCE = 150;
-constexpr int OBSTACLE_DISTANCE = 81;
-constexpr int WARNING_DISTANCE = 41;
-constexpr int BRAKE_DISTANCE = 16;
-
-enum class AlertLevel {
-    Safe,
-    ObstacleDetected,
-    Warning,
-    Brake,
-    Stop,
-    NotDetected
-};
+#include "ProjectConfig.h"
 
 class Sensor {
     public:
-        Sensor(const std::string& name);
+        explicit Sensor(const std::string& name);
 
         bool setDistance(int distance);
 
