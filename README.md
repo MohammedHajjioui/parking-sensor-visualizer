@@ -62,10 +62,7 @@ distance: 12
 ## Roadmap
 
 - [x] Implement four virtual sensors.
-- [x] Add distance validation.
-- [x] Add individual alert levels.
-- [x] Publish the console version on GitHub.
-- [ ] Refactor the sensor model using a C++ class.
+- [X] Refactor the sensor model using a C++ class.
 - [ ] Add a simulation mode for graphical testing.
 - [ ] Add a 2D graphical interface.
 - [ ] Evaluate integration with real distance sensors.

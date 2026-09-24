@@ -3,6 +3,8 @@
 //
 
 #include "Visualizer.h"
+
+#include <array>
 #include <raylib.h>
 
 namespace {
@@ -18,61 +20,39 @@ namespace {
     constexpr float ARC_INNER_RADIUS = 80.0f;
     constexpr float ARC_OUTER_RADIUS = 90.0f;
 
-    constexpr int ARC_SEGMENTS = 32;
+    constexpr int ARC_SEGMENTS = 42;
 
     const Color SENSOR_COLOR{255, 255, 255, 220};
 }
 
-void drawSensorArcs(Vector2 center, float startAngle, float endAngle, Color color) {
-    constexpr int ARC_COUNT = 4;
-    constexpr float ARC_SPACING = 22.0f;
+void drawSensorArcs(Vector2 center, float startAngle, float endAngle, Color color);
+bool drawSensorArcs2(const Sensor& sensor, Vector2 center, float startAngle, float endAngle);
+float getSensorColor(AlertLevel level);
 
-    for (int i = 0; i < ARC_COUNT; ++i) {
-        const float innerRadius = ARC_INNER_RADIUS + i * ARC_SPACING;
-
-        const float outerRadius = ARC_OUTER_RADIUS + i * ARC_SPACING;
-
-        DrawRingLines(
-            center,
-            innerRadius,
-            outerRadius,
-            startAngle,
-            endAngle,
-            ARC_SEGMENTS,
-            color
-        );
-    }
-}
-
-void runVisualizer() {
+void runVisualizer(std::array<Sensor, SENSOR_COUNT>& sensors) {
     InitWindow( SCREEN_WIDTH, SCREEN_HEIGHT, "Parking Sensor Visualizer");
-
     SetTargetFPS(60);
-
     Texture2D parkingView = LoadTexture("../assets/parking_view.png");
 
-    const float imageCenterX = IMAGE_X + IMAGE_WIDTH / 2.0f;
-
-    const float imageCenterY = IMAGE_Y + IMAGE_HEIGHT / 2.0f;
-
+    //drawing of sensors
     const Vector2 frontLeftCenter{
-        imageCenterX - 250.0f,
-        imageCenterY - 180.0f
+        420.0f,
+        140.0f
     };
 
     const Vector2 frontRightCenter{
-        imageCenterX + 250.0f,
-        imageCenterY - 180.0f
+        490.0f,
+        140.0f
     };
 
     const Vector2 rearLeftCenter{
-        imageCenterX - 250.0f,
-        imageCenterY + 180.0f
+        420.0f,
+        460.0f
     };
 
     const Vector2 rearRightCenter{
-        imageCenterX + 250.0f,
-        imageCenterY + 180.0f
+        490.0f,
+        460.0f
     };
 
     while (!WindowShouldClose()) {
@@ -105,31 +85,62 @@ void runVisualizer() {
 
         drawSensorArcs(
             frontLeftCenter,
-            210.0f,
-            330.0f,
+            180.0f,
+            270.0f,
             SENSOR_COLOR
         );
 
         drawSensorArcs(
             frontRightCenter,
-            210.0f,
-            330.0f,
+            270.0f,
+            360.0f,
             SENSOR_COLOR
         );
 
         drawSensorArcs(
             rearLeftCenter,
-            30.0f,
-            150.0f,
+            90.0f,
+            180.0f,
             SENSOR_COLOR
         );
 
         drawSensorArcs(
             rearRightCenter,
-            30.0f,
-            150.0f,
+            360.0f,
+            445.0f,
             SENSOR_COLOR
         );
+
+        //new code
+
+
+        drawSensorArcs2(sensors[0],
+            frontLeftCenter,
+            180.0f,
+            270.0f
+        );
+
+        drawSensorArcs2(
+            sensors[1],
+            frontRightCenter,
+            270.0f,
+            360.0f
+        );
+
+        drawSensorArcs2(
+            sensors[2],
+            rearLeftCenter,
+            90.0f,
+            180.0f
+        );
+
+        drawSensorArcs2(
+            sensors[3],
+            rearRightCenter,
+            360.0f,
+            445.0f
+        );
+
 
         EndDrawing();
     }
@@ -138,71 +149,90 @@ void runVisualizer() {
     CloseWindow();
 }
 
-/*void runVisualizer() {
-    const int screenWidth = 924;
-    const int screenHeight = 615;
+void drawSensorArcs(Vector2 center, float startAngle, float endAngle, Color color) {
+    constexpr int ARC_COUNT = 4;
+    constexpr float ARC_SPACING = 22.0f;
 
-    InitWindow(screenWidth, screenHeight, "Parking Sensor Visualizer");
-    SetTargetFPS(60);
+    for (int i = 0; i < ARC_COUNT; ++i) {
+        const float innerRadius = ARC_INNER_RADIUS + i * ARC_SPACING;
 
-    Texture2D parkingView = LoadTexture("../assets/parking_view.png");
-
-    while (!WindowShouldClose()) {
-        BeginDrawing();
-
-        //immagine di sfondo
-        ClearBackground(RAYWHITE);
-        Rectangle source{
-            0.0f,
-            0.0f,
-            static_cast<float>(parkingView.width),
-            static_cast<float>(parkingView.height)
-        };
-
-        Rectangle destination{
-            0.0f,
-            0.0f,
-            static_cast<float>(screenWidth),
-            static_cast<float>(screenHeight)
-        };
-
-        Vector2 origin{0.0f, 0.0f};
-
-        DrawTexturePro(
-            parkingView,
-            source,
-            destination,
-            origin,
-            0.0f,
-            WHITE
-        );
-
-        //accensione sensore
-        Vector2 frontLeftCenter{
-            258.0f,
-            104.0f
-        };
-
-        Color sensorColor{
-            255,
-            0,
-            0,
-            180
-        };
+        const float outerRadius = ARC_OUTER_RADIUS + i * ARC_SPACING;
 
         DrawRingLines(
-            frontLeftCenter,
-            80.0f,
-            90.0f,
-            197.0f,
-            250.0f,
-            32,
-            sensorColor
+            center,
+            innerRadius,
+            outerRadius,
+            startAngle,
+            endAngle,
+            ARC_SEGMENTS,
+            color
+        );
+    }
+}
+
+bool drawSensorArcs2(const Sensor& sensor, Vector2 center, float startAngle, float endAngle) {
+    constexpr float ARC_SPACING = 22.0f;
+    float numOfRed = getSensorColor(sensor.getAlertLevel());
+    if (numOfRed < 0 || numOfRed > 4)
+        return false;
+
+    float i=0 ;
+    while ( i < 4.0f - numOfRed) {
+        const float innerRadius = ARC_INNER_RADIUS + i * ARC_SPACING;
+        const float outerRadius = ARC_OUTER_RADIUS + i * ARC_SPACING;
+
+        DrawRing(
+        center,
+        innerRadius,
+        outerRadius,
+        startAngle,
+        endAngle,
+        ARC_SEGMENTS,
+        GREEN
         );
 
-        EndDrawing();
+        i++;
+
     }
 
-    UnloadTexture(parkingView);
-    CloseWindow();
-}*/
+    while ( i < 4) {
+        const float innerRadius = ARC_INNER_RADIUS + i * ARC_SPACING;
+        const float outerRadius = ARC_OUTER_RADIUS + i * ARC_SPACING;
+
+        DrawRing(
+        center,
+        innerRadius,
+        outerRadius,
+        startAngle,
+        endAngle,
+        ARC_SEGMENTS,
+        RED
+        );
+
+        i++;
+    }
+    return true;
+}
+
+float getSensorColor(const AlertLevel level) {
+    switch (level) {
+        case AlertLevel::Safe:
+            return 0;
+
+        case AlertLevel::ObstacleDetected:
+            return 1;
+
+        case AlertLevel::Warning:
+            return 2;
+
+        case AlertLevel::Brake:
+            return 3;
+
+        case AlertLevel::Stop:
+            return 4;
+
+        case AlertLevel::NotDetected:
+            return 5;
+    }
+    return -1;
+}

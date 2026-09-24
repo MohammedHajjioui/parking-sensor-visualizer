@@ -9,7 +9,7 @@ bool isValid (std::array<Sensor, SENSOR_COUNT>& sensors) {
     int value;
     std::cout << "\n";
     for (int i = 0; i < sensors.size(); i++) {
-        std::cout << "Enter "<< (sensors)[i].getName() << " distance (-1 to exit): ";
+        std::cout << "Enter "<< sensors[i].getName() << " distance (-1 to exit): ";
         if (!(std::cin >> value)) {
             std::cout << "Input non valido\n";
             std::cin.clear();

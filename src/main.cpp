@@ -9,8 +9,6 @@
 using AllSensors = std::array<Sensor, SENSOR_COUNT>;
 
 int main() {
-    runVisualizer();
-    return 0;
 
     AllSensors sensors{
         Sensor {"Front Left"},
@@ -20,10 +18,12 @@ int main() {
     };
 
     while (true) {
+
         if (!isValid(sensors)) {
             return 0;
         }
         printMessage(sensors);
+        runVisualizer(sensors);
 
     }
 }
