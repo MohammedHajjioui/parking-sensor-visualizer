@@ -3,6 +3,7 @@
 //
 
 #include "Visualizer.h"
+#include  "ConsoleInput.h"
 
 #include <array>
 #include <raylib.h>
@@ -56,6 +57,50 @@ void runVisualizer(std::array<Sensor, SENSOR_COUNT>& sensors) {
     };
 
     while (!WindowShouldClose()) {
+        if (IsKeyPressed(KEY_Q)) {
+            sensors[0].setDistance(
+                sensors[0].getDistance() + 10
+            );
+        }
+        else if (IsKeyPressed(KEY_O)) {
+            sensors[0].setDistance(
+                sensors[0].getDistance() - 10
+            );
+        }
+        else if (IsKeyPressed(KEY_W)) {
+            sensors[1].setDistance(
+                sensors[1].getDistance() + 10
+            );
+        }
+        else if (IsKeyPressed(KEY_P)) {
+            sensors[1].setDistance(
+                sensors[1].getDistance() - 10
+            );
+        }
+        else if (IsKeyPressed(KEY_A)) {
+            sensors[2].setDistance(
+                sensors[2].getDistance() + 10
+            );
+        }
+        else if (IsKeyPressed(KEY_K)) {
+            sensors[2].setDistance(
+                sensors[2].getDistance() - 10
+            );
+        }
+        else if (IsKeyPressed(KEY_S)) {
+            sensors[3].setDistance(
+                sensors[3].getDistance() + 10
+            );
+        }
+        else if (IsKeyPressed(KEY_L)) {
+            sensors[3].setDistance(
+                sensors[3].getDistance() - 10
+            );
+        }
+        /*if (!isValid(sensors)) {
+            break;
+        }
+        printMessage(sensors);*/
         BeginDrawing();
 
         ClearBackground(RAYWHITE);
@@ -111,8 +156,8 @@ void runVisualizer(std::array<Sensor, SENSOR_COUNT>& sensors) {
             SENSOR_COLOR
         );
 
-        //new code
 
+        //new code
 
         drawSensorArcs2(sensors[0],
             frontLeftCenter,

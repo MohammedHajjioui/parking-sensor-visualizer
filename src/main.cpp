@@ -17,13 +17,16 @@ int main() {
         Sensor {"Rear Right"}
     };
 
+    runVisualizer(sensors);
+    return 0;
+
     while (true) {
 
         if (!isValid(sensors)) {
             return 0;
         }
         printMessage(sensors);
-        runVisualizer(sensors);
+
 
     }
 }
