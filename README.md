@@ -2,7 +2,7 @@
 
 A C++20 parking-assistance simulator with four virtual distance sensors and a live 2D display built with raylib. Distance values are entered in the console; the graphical window updates the corresponding sensor arcs without waiting for the next console input.
 
-{SCREENSHOT: add a screenshot of the running application here. Save it under assets/ and replace this line with a Markdown image.}
+![Parking Sensor Visualizer showing four sensor alert zones](assets/Screenshot.png)
 
 ## Features
 
@@ -22,19 +22,6 @@ The acquisition thread publishes a value to its sensor's mutex-protected shared 
 Console input -> acquisition thread -> shared distance slots -> Sensor state -> raylib display
 ```
 
-## Build and run
-
-Requirements: a C++20 compiler, CMake, and Git. CMake fetches raylib 6.0 during configuration, so the initial configuration requires internet access.
-
-```bash
-cmake -S . -B build
-cmake --build build
-```
-
-Run the `parking_sensor` executable with the build directory as its working directory (for example, configure this in CLion). The image is currently loaded from `../assets/parking_view.png`, a path relative to that directory. If your CMake generator puts the executable in a configuration subdirectory, set its working directory explicitly to `build`. Keep the console available for entering distances.
-
-Press Esc or close the graphical window to stop rendering. **Current limitation:** if the acquisition thread is waiting for console input, closing the window alone may not terminate the process; return to the console and press Enter to let the thread exit and be joined.
-
 ## Project structure
 
 - `src/Sensor.*`: sensor state and alert classification.
@@ -52,7 +39,6 @@ This is a software simulation; no physical sensors are connected. Keyboard contr
 - [x] Model four virtual sensors and alert levels.
 - [x] Visualize alert states with raylib.
 - [x] Accept console updates while the GUI remains responsive.
-- [ ] Make shutdown independent of blocking console input.
 - [ ] Add automated tests for sensor thresholds and input handling.
 - [ ] Explore acquisition from physical distance sensors.
 
