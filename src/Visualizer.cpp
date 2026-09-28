@@ -8,6 +8,8 @@
 #include <array>
 #include <raylib.h>
 
+#include <mutex>
+
 namespace {
     constexpr int SCREEN_WIDTH = 924;
     constexpr int SCREEN_HEIGHT = 615;
@@ -30,7 +32,7 @@ void drawSensorArcs(Vector2 center, float startAngle, float endAngle, Color colo
 bool drawSensorArcs2(const Sensor& sensor, Vector2 center, float startAngle, float endAngle);
 float getSensorColor(AlertLevel level);
 
-void runVisualizer(std::array<Sensor, SENSOR_COUNT>& sensors) {
+void runVisualizer(std::array<Sensor, SENSOR_COUNT>& sensors, std::array<SharedDistance, SENSOR_COUNT>& sharedDistances) {
     InitWindow( SCREEN_WIDTH, SCREEN_HEIGHT, "Parking Sensor Visualizer");
     SetTargetFPS(60);
     Texture2D parkingView = LoadTexture("../assets/parking_view.png");
@@ -57,50 +59,29 @@ void runVisualizer(std::array<Sensor, SENSOR_COUNT>& sensors) {
     };
 
     while (!WindowShouldClose()) {
-        if (IsKeyPressed(KEY_Q)) {
-            sensors[0].setDistance(
-                sensors[0].getDistance() + 10
-            );
+        //new code
+        for (std::size_t i = 0; i < SENSOR_COUNT; ++i) {
+            int newDistance = 0;
+            bool receivedNewDistance = false;
+
+            {
+                std::lock_guard<std::mutex> lock(sharedDistances[i].mutex);
+
+                if (sharedDistances[i].hasNewValue) {
+                    newDistance = sharedDistances[i].value;
+                    sharedDistances[i].hasNewValue = false;
+                    receivedNewDistance = true;
+                }
+            }
+
+            if (receivedNewDistance) {
+                sensors[i].setDistance(newDistance);
+            }
         }
-        else if (IsKeyPressed(KEY_O)) {
-            sensors[0].setDistance(
-                sensors[0].getDistance() - 10
-            );
-        }
-        else if (IsKeyPressed(KEY_W)) {
-            sensors[1].setDistance(
-                sensors[1].getDistance() + 10
-            );
-        }
-        else if (IsKeyPressed(KEY_P)) {
-            sensors[1].setDistance(
-                sensors[1].getDistance() - 10
-            );
-        }
-        else if (IsKeyPressed(KEY_A)) {
-            sensors[2].setDistance(
-                sensors[2].getDistance() + 10
-            );
-        }
-        else if (IsKeyPressed(KEY_K)) {
-            sensors[2].setDistance(
-                sensors[2].getDistance() - 10
-            );
-        }
-        else if (IsKeyPressed(KEY_S)) {
-            sensors[3].setDistance(
-                sensors[3].getDistance() + 10
-            );
-        }
-        else if (IsKeyPressed(KEY_L)) {
-            sensors[3].setDistance(
-                sensors[3].getDistance() - 10
-            );
-        }
-        /*if (!isValid(sensors)) {
-            break;
-        }
-        printMessage(sensors);*/
+
+
+
+
         BeginDrawing();
 
         ClearBackground(RAYWHITE);

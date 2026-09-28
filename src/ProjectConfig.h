@@ -20,6 +20,4 @@ enum class AlertLevel {
 };
 
 
-
-
 #endif //PARKING_SENSOR_PROJECTCONFIG_H

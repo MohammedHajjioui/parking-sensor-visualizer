@@ -19,6 +19,7 @@ add_executable(parking_sensor src/main.cpp
         src/ConsoleInput.h
         src/Visualizer.cpp
         src/Visualizer.h
+        src/SharedDistance.h
 )
 
 target_link_libraries(parking_sensor PRIVATE raylib)
