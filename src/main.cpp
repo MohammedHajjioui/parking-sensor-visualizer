@@ -42,12 +42,27 @@ int main() {
                 break;  // Input terminato: non riprovare all'infinito.
             }
 
-            std::cout << "Input non valido\n";
-            std::cin.clear();
-            std::cin.ignore(
-                std::numeric_limits<std::streamsize>::max(), '\n'
-            );
-            continue;
+            if (std::cin.fail()) {
+                std::cin.clear();
+                std::cin.ignore(
+                    std::numeric_limits<std::streamsize>::max(),
+                    '\n'
+                );
+
+                value = std::numeric_limits<int>::max();
+
+                std::cout << "Valore troppo grande: impostato a "
+                    << value
+                    << '\n';
+            }
+            else {
+                std::cout << "Input non valido\n";
+                std::cin.clear();
+                std::cin.ignore(
+                    std::numeric_limits<std::streamsize>::max(), '\n'
+                );
+                continue;
+            }
         }
 
         // Se la finestra è stata chiusa mentre aspettavamo l'input,
