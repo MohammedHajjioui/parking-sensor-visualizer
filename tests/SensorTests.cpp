@@ -4,16 +4,19 @@
 
 int main() {
     Sensor sensor{"Front Left"};
+    assert(sensor.getName() == "Front Left");
 
     assert(sensor.getAlertLevel() == AlertLevel::NotDetected);
 
     assert(sensor.setDistance(0));
+    assert(sensor.getDistance() == 0);
     assert(sensor.getAlertLevel() == AlertLevel::Stop);
 
     assert(sensor.setDistance(15));
     assert(sensor.getAlertLevel() == AlertLevel::Stop);
 
     assert(sensor.setDistance(16));
+    assert(sensor.getDistance() == 16);
     assert(sensor.getAlertLevel() == AlertLevel::Brake);
 
     assert(sensor.setDistance(40));
