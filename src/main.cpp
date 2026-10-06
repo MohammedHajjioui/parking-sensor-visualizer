@@ -1,5 +1,4 @@
 #include "Sensor.h"
-#include "ConsoleInput.h"
 #include "visualizer.h"
 #include "ProjectConfig.h"
 #include "SharedDistance.h"
@@ -15,6 +14,7 @@ using AllSensors = std::array<Sensor, SENSOR_COUNT>;
 using AllSharedDistance = std::array<SharedDistance, SENSOR_COUNT>;
 
 bool isValid2(AllSharedDistance & sharedDistances, const AllSensors & sensors);
+bool readDistance(std::istream& inputStream, int& value);
 
 int main() {
 
@@ -29,67 +29,43 @@ int main() {
     std::atomic<bool> running{true};
 
     std::thread acquisitionThread([&sharedDistances, &running, &sensors]() {
-    std::size_t index = 0;
+        std::size_t index = 0;
 
-    while (running.load()) {
-        int value;
+        while (running.load()) {
+            int value;
 
-        std::cout << "Enter " << sensors[index].getName()
-                  << " distance: ";
+            std::cout << "Enter "
+                      << sensors[index].getName()
+                      << " distance: ";
 
-        if (!(std::cin >> value)) {
-            if (std::cin.eof()) {
-                break;  // Input terminato: non riprovare all'infinito.
-            }
+            if (!readDistance(std::cin, value)) {
+                if (std::cin.eof()) {
+                    break; //non continuiamo ad aspettare all'infinito
+                }
 
-            if (std::cin.fail()) {
-                std::cin.clear();
-                std::cin.ignore(
-                    std::numeric_limits<std::streamsize>::max(),
-                    '\n'
-                );
-
-                value = std::numeric_limits<int>::max();
-
-                std::cout << "Valore troppo grande: impostato a "
-                    << value
-                    << '\n';
-            }
-            else {
-                std::cout << "Input non valido\n";
-                std::cin.clear();
-                std::cin.ignore(
-                    std::numeric_limits<std::streamsize>::max(), '\n'
-                );
                 continue;
             }
-        }
 
-        // Se la finestra è stata chiusa mentre aspettavamo l'input,
-        // non pubblichiamo un'altra misura.
-        if (!running.load()) {
-            break;
-        }
-
-        if (value < 0) {
-            std::cout << "La distanza non puo' essere negativa\n";
-            continue;
-        }
-
-        SharedDistance& current = sharedDistances[index];
-
-        {
-            std::lock_guard<std::mutex> lock(current.mutex);
-
-            if (value != current.value) {
-                current.value = value;
-                current.hasNewValue = true;
+            // Se la finestra è stata chiusa mentre aspettavamo l'input,
+            // non pubblichiamo un'altra misura.
+            if (!running.load()) {
+                break;
             }
-        }
 
-        index = (index + 1) % SENSOR_COUNT;
-    }
-});
+            SharedDistance& current = sharedDistances[index];
+
+            {
+                std::lock_guard<std::mutex> lock(current.mutex);
+
+                if (value != current.value) {
+                    current.value = value;
+                    current.hasNewValue = true;
+                }
+            }
+
+            index = (index + 1) % SENSOR_COUNT;
+        }
+    });
 
     runVisualizer(sensors, sharedDistances);
 
@@ -97,12 +73,51 @@ int main() {
     acquisitionThread.join();
 
     return 0;
-    /*if (!isValid2(sharedDistances, sensors)) {
-            //cosa fare se:
-            //-valorre corrotto
-            //-valore molto alto
-            }
-            //printMessage(sensors);*/
 }
 
+
+
+bool readDistance(std::istream& inputStream, int& value) {
+    std::string input;
+
+    if (!std::getline(inputStream, input)) {// legge tutta la riga fino a quando premi Invio e la salva in input
+        return false;
+    }
+
+    if (input.empty() || input.front() == '-') {
+        std::cout << "Input non valido\n";
+        return false;
+    }
+
+    int parsedValue = 0;//variabile dove inseriremo il valore convertito
+
+    // from_chars converte i caratteri nell'intervallo [inizio, fine)
+    // result sarà una struttura con due info: .ec indica l'errore, .ptr dove termina la conversione.
+    // Rifiutiamo input non numerici o parziali; se il numero è fuori
+    // dall'intervallo di int, impostiamo value al massimo rappresentabile.
+    const auto result = std::from_chars(
+        input.data(),
+        input.data() + input.size(),
+        parsedValue
+    );
+
+    if (result.ec == std::errc::invalid_argument ||
+        result.ptr != input.data() + input.size()) {
+        std::cout << "Input non valido\n";
+        return false;
+        }
+
+    if (result.ec == std::errc::result_out_of_range) {
+        value = std::numeric_limits<int>::max();
+
+        std::cout << "Valore troppo grande: impostato a "
+                  << value
+                  << '\n';
+
+        return true;
+    }
+
+    value = parsedValue;
+    return true;
+}
 
